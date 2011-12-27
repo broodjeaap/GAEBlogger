@@ -1,0 +1,16 @@
+application: blog
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+
+
+- url: /.*
+  script: blog.py
+
+- url: /admin/*.*
+  script: admin.py
+  
+- url: /static
+  static_dir: static
