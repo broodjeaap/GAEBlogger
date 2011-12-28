@@ -120,3 +120,26 @@
 .commentBody {
 	
 }
+
+.articleTableDiv {
+	margin-left: auto;
+    margin-right: auto;
+	width:80%;
+	background-color: #EEE;
+	border-radius: 5px;
+	border: 1px solid #BBB;
+}
+
+.articleTable {
+	margin-left: auto;
+    margin-right: auto;
+	border-collapse: collapse;
+	width: 80%;
+}
+
+.articleTable tr.even{
+	background-color: #DDD;
+}
+.articleTable tr.odd{
+	background-color: #EEE;
+}

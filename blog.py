@@ -1,19 +1,20 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from models import *
+import misc
 import datetime
 
 
 class Main(webapp.RequestHandler):
     def get(self):
-        self.response.out.write(header())
+        self.response.out.write(misc.header())
         articles = getAllPublic()
         self.response.out.write(printArticles(articles))
         self.response.out.write(footer())
 
 class Article(webapp.RequestHandler):
     def get(self):
-        self.response.out.write(header())
+        self.response.out.write(misc.header())
         id = self.request.get('id')
         if(id.isdigit()):
             article = getArticle(id)
@@ -90,8 +91,8 @@ def printArticlePage(article):
     return ret
 
 def printArticle(article):
-    title = makeLink("/article?id="+str(article.id), article.title)
-    comments = makeLink("/article?id="+str(article.id), "Comments ("+str(countComments(article.comments))+")")   
+    title = misc.makeLink("/article?id="+str(article.id), article.title)
+    comments = misc.makeLink("/article?id="+str(article.id), "Comments ("+str(countComments(article.comments))+")")   
     ret = """
         <div class='article'>
             <div class='articleHeader'>
@@ -149,28 +150,6 @@ def printComment(comment):
         </div>
     </div>
     """ %(comment.author,str(comment.date),key,key,comment.body,key)
-    return ret
-
-def makeLink(url,content):
-    return "<a href='%s'>%s</a>" %(url,content)
-
-def header():
-    ret = """
-    <html>
-        <head>
-            <link rel="stylesheet" href="/static/global.css"/>
-            <script type='text/javascript' src='/static/jquery-1.6.4.js'></SCRIPT>
-            <script type='text/javascript' src='/static/script.js'></SCRIPT>
-        </head>
-        <body>
-            <div class='content'>
-                <div class='header'>
-                    <a href='/'>David van Zessen</a>
-                </div>"""
-    return ret
-
-def footer():
-    ret = "</div></body></html>"
     return ret
 
 def main():
