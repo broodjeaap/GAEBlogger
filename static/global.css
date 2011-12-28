@@ -1,0 +1,81 @@
+.content {
+	font: normal 1em Georgia, "Times New Roman", Times, serif;
+    background-color: #DDD;
+	border-radius: 1em 4em 1em 4em;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    width: 50%;
+	min-height:400px;
+	height:auto;
+	padding: 0 0 30px 0;
+}
+
+.header {
+	font: normal 3em Georgia, "Times New Roman", Times, serif;
+	margin: 0 0 15px 15px;
+	font-weight: bold;
+}
+
+.article {
+	background-color: #AAA;
+	border-radius: 15px;
+	margin: 10px 10px 10px 10px;
+	padding: 5px 10px 5px 10px;
+}
+
+.articleHeader {
+	background-color: #6F6;
+	border: 1px solid #ddd;
+	padding: 10px 0 10px 5px;
+	background: #f0f0f0;
+	width: 100%;
+}
+
+.articleTitle {
+	font: normal 3em Georgia, "Times New Roman", Times, serif;
+	text-shadow: 1px 1px 1px #ccc;
+}
+
+.articleDate {
+	background-color: #66F;
+	font: normal 1em Georgia, "Times New Roman", Times, serif;
+}
+
+.articleBody {
+	background-color: #6FF;
+	padding: 10px 0 10px 0;
+}
+
+.articleComments {
+	background-color: #6FF;
+	border-radius: 0.5em 0.5em 0.5em 0.5em;
+	padding: 5px 5px 5px 5px;
+	margin: 10px;
+}
+
+.articleComment {
+	background-color: #DDD;
+	border-radius: 0.5em 0.5em 0.5em 0.5em;
+	padding: 5px 5px 5px 5px;
+	margin: 10px;
+}
+
+.commentHeader {
+	width: 100%;
+}
+
+.commentAuthor {
+	width:40%;
+	float:left;
+}
+
+.commentDate {
+	width:60%;
+	float:left;
+	color:#AAA;
+}
+
+.commentBody {
+	
+}
