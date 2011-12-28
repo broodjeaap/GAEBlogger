@@ -1,14 +1,37 @@
 .content {
 	font: normal 1em Georgia, "Times New Roman", Times, serif;
-    background-color: #DDD;
-	border-radius: 1em 4em 1em 4em;
+    background-color: #FFF;
+	border: 1px solid #BBB;
+	border-radius: 5px;
     margin-left: auto;
     margin-right: auto;
     text-align: left;
     width: 50%;
 	min-height:400px;
 	height:auto;
-	padding: 0 0 30px 0;
+	padding: 10px 10px 30px 10px;
+}
+
+.header a:link {
+	color:#000;
+	text-decoration:none;
+}
+.header a:visited {
+	color:#777;
+}
+.header a:hover {
+	color:#333;
+}
+
+.article a:link {
+	color:#000;
+	text-decoration:none;
+}
+.article a:visited {
+	color:#777;
+}
+.article a:hover {
+	color:#333;
 }
 
 .header {
@@ -18,44 +41,54 @@
 }
 
 .article {
-	background-color: #AAA;
-	border-radius: 15px;
-	margin: 10px 10px 10px 10px;
+	background-color: #EEE;
+	border-radius: 5px;
+	border: 1px solid #BBB;
+	margin: 0 0 10px 0;
 	padding: 5px 10px 5px 10px;
 }
 
 .articleHeader {
-	background-color: #6F6;
-	border: 1px solid #ddd;
-	padding: 10px 0 10px 5px;
-	background: #f0f0f0;
+	float: left;
+	padding: 5px 0 5px 5px;
 	width: 100%;
 }
 
 .articleTitle {
 	font: normal 3em Georgia, "Times New Roman", Times, serif;
 	text-shadow: 1px 1px 1px #ccc;
+	float:left;
 }
 
 .articleDate {
-	background-color: #66F;
+	color:#AAA;
 	font: normal 1em Georgia, "Times New Roman", Times, serif;
+	float: right;
 }
 
 .articleBody {
-	background-color: #6FF;
 	padding: 10px 0 10px 0;
+	width: 100%;
 }
 
 .articleComments {
-	background-color: #6FF;
+	background-color: #FFF;
 	border-radius: 0.5em 0.5em 0.5em 0.5em;
+	border: 1px solid #BBB;
+	padding: 10px 1px 5px 5px;
+	margin: 10px;
+	
+}
+
+.articleCommentsSwitch {
+	background-color: #EEE;
+	border-radius: 0.5em 0.5em 0.5em 0.5em;
+	border: 1px solid #BBBCBF;
 	padding: 5px 5px 5px 5px;
 	margin: 10px;
 }
 
 .articleComment {
-	background-color: #DDD;
 	border-radius: 0.5em 0.5em 0.5em 0.5em;
 	padding: 5px 5px 5px 5px;
 	margin: 10px;
@@ -66,14 +99,22 @@
 }
 
 .commentAuthor {
+	color:#DBA246;
 	width:40%;
 	float:left;
 }
 
 .commentDate {
-	width:60%;
+	width:50%;
 	float:left;
 	color:#AAA;
+}
+
+.commentReply {
+	width:10%;
+	float:left;
+	color:#888;
+	text-align: center
 }
 
 .commentBody {

@@ -35,6 +35,7 @@ class AdminNewArticlePost(webapp.RequestHandler):
         public = (self.request.get('public') == 'public')
         article = models.Article(id= id,title = title,body = body,date=datetime.datetime.now().date(),public=public)
         article.put()
+        self.redirect('/article?id='+str(article.id))
         
 
 def header():

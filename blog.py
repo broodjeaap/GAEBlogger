@@ -21,7 +21,12 @@ class Article(webapp.RequestHandler):
                 self.redirect('/')
             else:
                 self.response.out.write(printArticlePage(article))
-                self.response.out.write(printComments(article))
+                length = len(article.comments) 
+                if(length > 0):
+                    self.response.out.write("Comments ("+str(countComments(article.comments))+"): ")
+                else:
+                    self.response.out.write("Be the first to comment!")
+                self.response.out.write(printComments(article.comments))
                 self.response.out.write(commentBox(article))
         else:
             self.redirect('/')
@@ -30,11 +35,20 @@ class Article(webapp.RequestHandler):
 class CommentPost(webapp.RequestHandler):
     def post(self):
         article = db.get(self.request.get('key'))
-        comment = Comment(author="anon",body=self.request.get('commentBody'),date=datetime.datetime.now().date())
+        comment = Comment(author="anon",body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=article.key())
         comment.put()
         article.comments.append(comment.key())
         article.put()
         self.redirect('/article?id='+str(article.id))
+        
+class ReplyPost(webapp.RequestHandler):
+    def post(self):
+        parentComment = db.get(self.request.get('commentKey'))
+        comment = Comment(author="anon",body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=parentComment.article)
+        comment.put()
+        parentComment.children.append(comment.key())
+        parentComment.put()
+        self.redirect('/article?id='+str(comment.article.id))
 
 def commentBox(article):
     ret = """
@@ -77,7 +91,7 @@ def printArticlePage(article):
 
 def printArticle(article):
     title = makeLink("/article?id="+str(article.id), article.title)
-    comments = makeLink("/article?id="+str(article.id), "Comments ("+str(len(article.comments))+")")   
+    comments = makeLink("/article?id="+str(article.id), "Comments ("+str(countComments(article.comments))+")")   
     ret = """
         <div class='article'>
             <div class='articleHeader'>
@@ -98,19 +112,22 @@ def printArticle(article):
     """ %(title, str(article.date), article.body,comments)
     return ret
 
-def printComments(article):
-    ret = "<div class='articleComments'>"
-    length = len(article.comments)
-    if(length > 0):
-        ret += str(length)+" comments:"
+def printComments(comments,switch=False):
+    if(switch):
+        ret = "<div class='articleCommentsSwitch'>"
     else:
-        ret += "Be the first to comment!"
-    for key in article.comments:
-        ret += printComment(getComment(key))
+        ret = "<div class='articleComments'>"
+    for key in comments:
+        comment = getComment(key)
+        ret += printComment(comment)
+        if(len(comment.children) > 0):
+            ret += printComments(comment.children,(not switch))
+        
     ret += "</div>"
     return ret
 
 def printComment(comment):
+    key = str(comment.key())
     ret = """
     <div class='articleComment'>
         <div class='commentHeader'>
@@ -120,12 +137,18 @@ def printComment(comment):
             <div class='commentDate'>
                 %s
             </div>
+            <div class='commentReply'>
+                <a id='link_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>
+            </div>
         </div>
         <div class='commentBody'>
             %s
         </div>
+        <div id='div_%s' class='commentReplyDiv'>
+            
+        </div>
     </div>
-    """ %(comment.author,str(comment.date),comment.body)
+    """ %(comment.author,str(comment.date),key,key,comment.body,key)
     return ret
 
 def makeLink(url,content):
@@ -136,6 +159,8 @@ def header():
     <html>
         <head>
             <link rel="stylesheet" href="/static/global.css"/>
+            <script type='text/javascript' src='/static/jquery-1.6.4.js'></SCRIPT>
+            <script type='text/javascript' src='/static/script.js'></SCRIPT>
         </head>
         <body>
             <div class='content'>
@@ -151,7 +176,8 @@ def footer():
 def main():
     application = webapp.WSGIApplication([('/', Main),
                                           ('/article', Article),
-                                          ('/commentpost', CommentPost)],
+                                          ('/commentpost', CommentPost),
+                                          ('/replypost', ReplyPost)],
                                          debug=True)
     util.run_wsgi_app(application)
 
