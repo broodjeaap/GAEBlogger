@@ -105,13 +105,13 @@
 }
 
 .commentDate {
-	width:50%;
+	width:40%;
 	float:left;
 	color:#AAA;
 }
 
 .commentReply {
-	width:10%;
+	width:20%;
 	float:left;
 	color:#888;
 	text-align: center

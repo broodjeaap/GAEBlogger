@@ -77,6 +77,13 @@ class CommentPost(webapp.RequestHandler):
         article.put()
         self.redirect('/article?id='+str(article.id))
         
+class EditCommentPost(webapp.RequestHandler):
+    def post(self):
+        comment = db.get(self.request.get('commentKey'))
+        comment.body = self.request.get('commentBody')
+        comment.put()
+        self.redirect('/article?id='+str(comment.article.id))
+        
 class ReplyPost(webapp.RequestHandler):
     def post(self):
         parentComment = db.get(self.request.get('commentKey'))
@@ -84,6 +91,16 @@ class ReplyPost(webapp.RequestHandler):
         comment.put()
         parentComment.children.append(comment.key())
         parentComment.put()
+        self.redirect('/article?id='+str(comment.article.id))
+
+class DeleteCommentPost(webapp.RequestHandler):
+    def post(self):
+        comment = db.get(self.request.get('key'))
+        comment.title = "deleted"
+        comment.body = "deleted"
+        comment.author = users.User("deleted")
+        comment.date = datetime.datetime.now().date()
+        comment.put()
         self.redirect('/article?id='+str(comment.article.id))
 
 def printArticlePage(article):
@@ -127,7 +144,18 @@ def printComments(comments,switch=False):
     return ret
 
 def printComment(comment):
+    user = users.get_current_user()
     key = str(comment.key())
+    deleteEdit = ""
+    if(user == comment.author):
+        deleteEdit = """
+        <a href='javascript:void(0)' onclick="deleteComment('%s')" >delete</a>
+        <a id='edit_%s' href='javascript:void(0)' onclick="editComment('%s')" >edit</a>
+        <form id='deleteComment_%s' name='deleteComment_%s' action='/deletecommentpost' method='post'>
+            <input type='hidden' name='key' value='%s' />
+        </form>
+        """ %(key,key,key,key,key,key)
+    
     ret = """
     <div class='articleComment'>
         <div class='commentHeader'>
@@ -138,23 +166,26 @@ def printComment(comment):
                 %s
             </div>
             <div class='commentReply'>
-                <a id='link_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>
+                <a id='reply_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>
+                %s
             </div>
         </div>
-        <div class='commentBody'>
-            %s
+        <div id='commentBody_%s' class='commentBody'>
+%s
         </div>
         <div id='div_%s' class='commentReplyDiv'>
             
         </div>
     </div>
-    """ %(comment.author,str(comment.date),key,key,comment.body,key)
+    """ %(comment.author,str(comment.date),key,key,deleteEdit,key,comment.body,key)
     return ret
 
 def main():
     application = webapp.WSGIApplication([('/', Main),
                                           ('/article', Article),
                                           ('/commentpost', CommentPost),
+                                          ('/deletecommentpost', DeleteCommentPost),
+                                          ('/editcommentpost', EditCommentPost),
                                           ('/replypost', ReplyPost)],
                                          debug=True)
     util.run_wsgi_app(application)
