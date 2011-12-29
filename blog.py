@@ -10,7 +10,11 @@ class Main(webapp.RequestHandler):
     def get(self):
         self.response.out.write(misc.header())
         articles = misc.getAllPublicArticles()
-        self.response.out.write(printArticles(articles))
+        articlesDiv = "<div class='articlesDiv'>"
+        for article in articles:
+            articlesDiv += printArticle(article)
+        articlesDiv += "</div>"
+        self.response.out.write(articlesDiv)
         self.response.out.write(misc.footer())
 
 class Article(webapp.RequestHandler):
@@ -23,7 +27,22 @@ class Article(webapp.RequestHandler):
             if(article == None):
                 self.redirect('/')
             else:
-                self.response.out.write(printArticlePage(article))
+                self.response.out.write(
+                                        """
+                                        <div class='article'>
+                                            <div class='articleHeader'>
+                                                <div class='articleTitle'>
+                                                    %s
+                                                </div>
+                                                <div class='articleDate'>
+                                                    %s
+                                                </div>
+                                            </div>
+                                            <div class='articleBody'>
+                                                %s
+                                            </div>
+                                        </div>
+                                    """ %(article.title, str(article.date), article.body))
                 length = len(article.comments) 
                 if(length > 0):
                     self.response.out.write("Comments ("+str(misc.countComments(article.comments))+"): ")
@@ -31,7 +50,18 @@ class Article(webapp.RequestHandler):
                     self.response.out.write("Be the first to comment!")
                 self.response.out.write(printComments(article.comments))
                 if(user):
-                    self.response.out.write(commentBox(article))
+                    self.response.out.write(
+                                            """
+                                            <div class='commentBox'><form name='comment' action='/commentpost' method='post'>
+                                                <div class='commentTextArea'>
+                                                    <textarea name='commentBody' cols='50' rows='6'></textarea>
+                                                </div>
+                                                <div class='commentHiddenSubmit'>
+                                                    <input type='hidden' name='key' value='%s' />
+                                                    <input type='submit' value='Comment' />
+                                                </div>
+                                            </div>
+                                            """ %(str(article.key())))
                 else:
                     self.response.out.write("<a href='"+users.create_login_url(self.request.uri)+"'>Login to comment.</a>")
         else:
@@ -56,43 +86,8 @@ class ReplyPost(webapp.RequestHandler):
         parentComment.put()
         self.redirect('/article?id='+str(comment.article.id))
 
-def commentBox(article):
-    ret = """
-    <div class='commentBox'><form name='comment' action='/commentpost' method='post'>
-        <div class='commentTextArea'>
-            <textarea name='commentBody' cols='50' rows='6'></textarea>
-        </div>
-        <div class='commentHiddenSubmit'>
-            <input type='hidden' name='key' value='%s' />
-            <input type='submit' value='Comment' />
-        </div>
-    </div>
-    """ %(str(article.key()))
-    return ret
-
-def printArticles(articles):
-    ret = "<div class='articlesDiv'>"
-    for article in articles:
-        ret += printArticle(article)
-    ret += "</div>"
-    return ret
-
 def printArticlePage(article):
-    ret = """
-        <div class='article'>
-            <div class='articleHeader'>
-                <div class='articleTitle'>
-                    %s
-                </div>
-                <div class='articleDate'>
-                    %s
-                </div>
-            </div>
-            <div class='articleBody'>
-                %s
-            </div>
-        </div>
-    """ %(article.title, str(article.date), article.body)
+    
     return ret
 
 def printArticle(article):

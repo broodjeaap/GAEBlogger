@@ -38,7 +38,7 @@ class AdminArticle(webapp.RequestHandler):
                     <input type='text' name='title' value='%s' />
                 </div>
                 <div class='editBody'>
-                    <textarea name='body' cols='60' rows='10'>%s</textarea>
+                    <textarea name='body' cols='100' rows='20'>%s</textarea>
                 </div>
                 <div class='editPublic'>
                     <input type='checkbox' name='public' %s value='public' />Public
@@ -66,13 +66,15 @@ class AdminEditArticlePost(webapp.RequestHandler):
 class AdminNewArticle(webapp.RequestHandler):
     def get(self):
         self.response.out.write(misc.header())
-        form = "<div id='newArticleDiv'><form name='newArticle' action='/admin/newpost' method='post'>"
-        form += "<div class='adminTitle' id='newArticleTitle'><input type='text' value='Title' name='title' id='title'/></div>"
-        form += "<div class='adminBody' id='newArticleBody'><textarea name='body' cols='60' rows='10'></textarea></div>"
-        form += "<div class='adminPublic' id='newArticlePublic'><input type='checkbox' name='public' value='public' /> Publish on blog. </div>"
-        form += "<div class='adminSubmit' id='newArticleSubmit'><input type='submit' name='submit' value='Save' /></div>"
-        form += "</form></div>"
-        self.response.out.write(form)
+        self.response.out.write(
+        """
+        <div id='newArticleDiv'><form name='newArticle' action='/admin/newpost' method='post'>
+        <div class='adminTitle' id='newArticleTitle'><input type='text' value='Title' name='title' id='title'/></div>
+        <div class='adminBody' id='newArticleBody'><textarea name='body' cols='60' rows='10'></textarea></div>
+        <div class='adminPublic' id='newArticlePublic'><input type='checkbox' name='public' value='public' /> Publish on blog. </div>
+        <div class='adminSubmit' id='newArticleSubmit'><input type='submit' name='submit' value='Save' /></div>
+        </form></div>
+        """)
         self.response.out.write(misc.footer())
 
 class AdminNewArticlePost(webapp.RequestHandler):
