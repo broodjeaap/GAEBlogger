@@ -1,6 +1,7 @@
 from google.appengine.ext import db
 
 
+
 class Article(db.Model):
     id = db.IntegerProperty()
     title = db.StringProperty(required=True)
@@ -15,4 +16,5 @@ class Comment(db.Model):
     body = db.TextProperty(required=True)
     date = db.DateProperty(required=True)
     children = db.ListProperty(db.Key)
+    _parent = db.SelfReferenceProperty()
     article = db.ReferenceProperty(required=True)

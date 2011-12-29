@@ -80,7 +80,7 @@ class CommentPost(webapp.RequestHandler):
 class ReplyPost(webapp.RequestHandler):
     def post(self):
         parentComment = db.get(self.request.get('commentKey'))
-        comment = Comment(author=users.get_current_user(),body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=parentComment.article)
+        comment = Comment(author=users.get_current_user(),body=self.request.get('commentBody'),date=datetime.datetime.now().date(),_parent=parentComment,article=parentComment.article.key())
         comment.put()
         parentComment.children.append(comment.key())
         parentComment.put()
@@ -123,7 +123,6 @@ def printComments(comments,switch=False):
         ret += printComment(comment)
         if(len(comment.children) > 0):
             ret += printComments(comment.children,(not switch))
-        
     ret += "</div>"
     return ret
 

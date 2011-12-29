@@ -1,6 +1,7 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext import db
+from google.appengine.api import users
 import models
 import datetime
 import blog
@@ -32,6 +33,7 @@ class AdminArticle(webapp.RequestHandler):
         if(article.public):
             checked = "checked='checked'"
         articleDiv = """
+        <script type='text/javascript' src='/static/admin.js'></SCRIPT>
         <div class='articleEditDiv'>
             <form name='editArticle' action='/admin/editpost' method='post'>
                 <div class='titleEditDiv'>
@@ -48,6 +50,7 @@ class AdminArticle(webapp.RequestHandler):
             </form>
         </div>""" %(article.title, article.body, checked, str(article.key()))
         self.response.out.write(articleDiv)
+        self.response.out.write(printAdminComments(article.comments))
         self.response.out.write(misc.footer())
 
 class AdminEditArticlePost(webapp.RequestHandler):
@@ -62,7 +65,20 @@ class AdminEditArticlePost(webapp.RequestHandler):
         article.date = datetime.datetime.now().date()
         article.put()
         self.redirect('/admin/article?id='+str(article.id))
-
+        
+class DeleteCommentPost(webapp.RequestHandler):
+    def post(self):
+        key = self.request.get('key')
+        comment = db.get(key)
+        comment.title = "removed"
+        comment.body = "This comment was removed because: <br />"+self.request.get('reason')
+        comment.author = users.User("removed")
+        comment.date = datetime.datetime.now().date()
+        comment.put()
+        self.redirect('/admin/article?id='+str(comment.article.id))
+        
+        
+    
 class AdminNewArticle(webapp.RequestHandler):
     def get(self):
         self.response.out.write(misc.header())
@@ -70,7 +86,7 @@ class AdminNewArticle(webapp.RequestHandler):
         """
         <div id='newArticleDiv'><form name='newArticle' action='/admin/newpost' method='post'>
         <div class='adminTitle' id='newArticleTitle'><input type='text' value='Title' name='title' id='title'/></div>
-        <div class='adminBody' id='newArticleBody'><textarea name='body' cols='60' rows='10'></textarea></div>
+        <div class='adminBody' id='newArticleBody'><textarea name='body' cols='100' rows='20'></textarea></div>
         <div class='adminPublic' id='newArticlePublic'><input type='checkbox' name='public' value='public' /> Publish on blog. </div>
         <div class='adminSubmit' id='newArticleSubmit'><input type='submit' name='submit' value='Save' /></div>
         </form></div>
@@ -92,12 +108,54 @@ class AdminNewArticlePost(webapp.RequestHandler):
         article.put()
         self.redirect('/article?id='+str(article.id))
 
+def printAdminComments(comments,switch=False):
+    if(switch):
+        ret = "<div class='articleCommentsSwitch'>"
+    else:
+        ret = "<div class='articleComments'>"
+    for key in comments:
+        comment = misc.getComment(key)
+        ret += printAdminComment(comment)
+        if(len(comment.children) > 0):
+            ret += printAdminComments(comment.children,(not switch))
+        
+    ret += "</div>"
+    return ret
+
+def printAdminComment(comment):
+    key = str(comment.key())
+    ret = """
+    <div class='articleComment'>
+        <div class='commentHeader'>
+            <div class='commentAuthor'>    
+                %s
+            </div>
+            <div class='commentDate'>
+                %s
+            </div>
+            <div class='commentDelete'>
+                <form id='form_%s' name='deleteComment' action='/admin/deletecommentpost' method='post'>
+                    <input type='hidden' name='key' value='%s' />
+                    <input type='hidden' name='reason' value='' id='reason_%s'/>
+                    <input type='button' value='Delete' onclick="deletecomment('%s')" />
+                </form>
+                
+            </div>
+        </div>
+        <div class='commentBody'>
+            %s
+        </div>
+    </div>
+    """ %(comment.author,str(comment.date),key,key,key,key,comment.body)
+    return ret
+
 def main():
     application = webapp.WSGIApplication([('/admin', AdminMain),
                                           ('/admin/new',AdminNewArticle),
                                           ('/admin/article',AdminArticle),
                                           ('/admin/newpost',AdminNewArticlePost),
-                                          ('/admin/editpost',AdminEditArticlePost)],
+                                          ('/admin/editpost',AdminEditArticlePost),
+                                          ('/admin/deletecommentpost',DeleteCommentPost)],
                                          debug=True)
     util.run_wsgi_app(application)
 
