@@ -122,6 +122,7 @@
 }
 
 .articleTableDiv {
+	padding: 10px 0 10px 0;
 	margin-left: auto;
     margin-right: auto;
 	width:80%;
@@ -136,7 +137,24 @@
 	border-collapse: collapse;
 	width: 80%;
 }
+.articleTable tr.head{
+	background-color: #BBB;
+}
+.articleTable td.id{
 
+}
+.articleTable td.title{
+	border-left-style:solid;
+	border-color:#CCC;
+}
+.articleTable td.comment{
+	border-left-style:solid;
+	border-color:#CCC;
+}
+.articleTable td.public{
+	border-left-style:solid;
+	border-color:#CCC;
+}
 .articleTable tr.even{
 	background-color: #DDD;
 }

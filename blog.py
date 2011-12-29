@@ -1,4 +1,5 @@
 from google.appengine.ext import webapp
+from google.appengine.api import users
 from google.appengine.ext.webapp import util
 from models import *
 import misc
@@ -8,35 +9,39 @@ import datetime
 class Main(webapp.RequestHandler):
     def get(self):
         self.response.out.write(misc.header())
-        articles = getAllPublic()
+        articles = misc.getAllPublicArticles()
         self.response.out.write(printArticles(articles))
-        self.response.out.write(footer())
+        self.response.out.write(misc.footer())
 
 class Article(webapp.RequestHandler):
     def get(self):
         self.response.out.write(misc.header())
         id = self.request.get('id')
+        user = users.get_current_user()
         if(id.isdigit()):
-            article = getArticle(id)
+            article = misc.getArticle(id)
             if(article == None):
                 self.redirect('/')
             else:
                 self.response.out.write(printArticlePage(article))
                 length = len(article.comments) 
                 if(length > 0):
-                    self.response.out.write("Comments ("+str(countComments(article.comments))+"): ")
+                    self.response.out.write("Comments ("+str(misc.countComments(article.comments))+"): ")
                 else:
                     self.response.out.write("Be the first to comment!")
                 self.response.out.write(printComments(article.comments))
-                self.response.out.write(commentBox(article))
+                if(user):
+                    self.response.out.write(commentBox(article))
+                else:
+                    self.response.out.write("<a href='"+users.create_login_url(self.request.uri)+"'>Login to comment.</a>")
         else:
             self.redirect('/')
-        self.response.out.write(footer())
+        self.response.out.write(misc.footer())
         
 class CommentPost(webapp.RequestHandler):
     def post(self):
         article = db.get(self.request.get('key'))
-        comment = Comment(author="anon",body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=article.key())
+        comment = Comment(author=users.get_current_user(),body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=article.key())
         comment.put()
         article.comments.append(comment.key())
         article.put()
@@ -45,7 +50,7 @@ class CommentPost(webapp.RequestHandler):
 class ReplyPost(webapp.RequestHandler):
     def post(self):
         parentComment = db.get(self.request.get('commentKey'))
-        comment = Comment(author="anon",body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=parentComment.article)
+        comment = Comment(author=users.get_current_user(),body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=parentComment.article)
         comment.put()
         parentComment.children.append(comment.key())
         parentComment.put()
@@ -92,7 +97,7 @@ def printArticlePage(article):
 
 def printArticle(article):
     title = misc.makeLink("/article?id="+str(article.id), article.title)
-    comments = misc.makeLink("/article?id="+str(article.id), "Comments ("+str(countComments(article.comments))+")")   
+    comments = misc.makeLink("/article?id="+str(article.id), "Comments ("+str(misc.countComments(article.comments))+")")   
     ret = """
         <div class='article'>
             <div class='articleHeader'>
@@ -119,7 +124,7 @@ def printComments(comments,switch=False):
     else:
         ret = "<div class='articleComments'>"
     for key in comments:
-        comment = getComment(key)
+        comment = misc.getComment(key)
         ret += printComment(comment)
         if(len(comment.children) > 0):
             ret += printComments(comment.children,(not switch))
