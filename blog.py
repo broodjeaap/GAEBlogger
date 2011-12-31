@@ -152,7 +152,7 @@ def printComment(comment):
     key = str(comment.key())
     reply = ""
     if(user):
-        reply ="""<a id='reply_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>""" (key,key)
+        reply ="""<a id='reply_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>""" %(key,key)
     deleteEdit = ""
     if(user == comment.author):
         deleteEdit = """
