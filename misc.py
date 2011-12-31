@@ -1,5 +1,6 @@
 import sys
 from google.appengine.ext import db
+from google.appengine.api import memcache
 
 MAX = 2147483647
 
@@ -26,22 +27,46 @@ def footer():
     return ret
 
 def getComment(key):
-    return db.get(key)
+    comment = memcache.get(str(key))
+    if(comment != None):
+        return comment
+    else:
+        comment = db.get(key)
+        memcache.set(str(key), comment)
+        return comment
 
 def getArticle(id):
-    articles = db.GqlQuery("SELECT * FROM Article WHERE id = "+id)
-    if(articles.count() >= 1):
-        return articles.get()
+    article = memcache.get("article"+id)
+    if(article != None):
+        return article
     else:
-        return None
+        articles = db.GqlQuery("SELECT * FROM Article WHERE id = "+id)
+        if(articles.count() >= 1):
+            article = articles.get()
+            memcache.set("article"+id,article)
+            return article
+        else:
+            return None
 
 def getAllArticles():
-    articles = db.GqlQuery("SELECT * FROM Article")
-    return articles.fetch(MAX)
+    articles = memcache.get("allArticles")
+    if(articles != None):
+        return articles
+    else:
+        articles = db.GqlQuery("SELECT * FROM Article")
+        articles = articles.fetch(MAX)
+        memcache.set("allArticles",articles)
+        return articles
 
 def getAllPublicArticles():
-    articles = db.GqlQuery("SELECT * FROM Article WHERE public = True")
-    return articles.fetch(MAX)
+    articles = memcache.get("publicArticles")
+    if(articles != None):
+        return articles
+    else:
+        articles = db.GqlQuery("SELECT * FROM Article WHERE public = True")
+        articles = articles.fetch(MAX)
+        memcache.set("publicArticles",articles)
+        return articles
         
 def countComments(list):
     count = 0

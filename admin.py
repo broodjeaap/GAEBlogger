@@ -2,7 +2,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext import db
 from google.appengine.api import users
-from google.appengine.api.app_identity import get_application_id
+from google.appengine.api import memcache
 import models
 import datetime
 import blog
@@ -93,6 +93,9 @@ class AdminEditArticlePost(webapp.RequestHandler):
         else:
             article.public = False
         article.date = datetime.datetime.now().date()
+        memcache.set("article"+str(article.id),article)
+        memcache.delete("publicArticles")
+        memcache.delete("allArticles")
         article.put()
         self.redirect('/admin/article?id='+str(article.id))
         
@@ -105,6 +108,7 @@ class DeleteCommentPost(webapp.RequestHandler):
         comment.author = users.User("removed")
         comment.date = datetime.datetime.now().date()
         comment.put()
+        memcache.set(str(comment.key()),comment)
         self.redirect('/admin/article?id='+str(comment.article.id))
         
         
@@ -136,6 +140,7 @@ class AdminNewArticlePost(webapp.RequestHandler):
         public = (self.request.get('public') == 'public')
         article = models.Article(id= id,title = title,body = body,date=datetime.datetime.now().date(),public=public)
         article.put()
+        memcache.add("article"+str(article.id),article)
         self.redirect('/article?id='+str(article.id))
 
 def printAdminComments(comments,switch=False):

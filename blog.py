@@ -1,6 +1,7 @@
 from google.appengine.ext import webapp
 from google.appengine.api import users
 from google.appengine.ext.webapp import util
+from google.appengine.api import memcache
 from models import *
 import misc
 import datetime
@@ -73,15 +74,19 @@ class CommentPost(webapp.RequestHandler):
         article = db.get(self.request.get('key'))
         comment = Comment(author=users.get_current_user(),body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=article.key())
         comment.put()
+        memcache.set(str(comment.key()),comment)
         article.comments.append(comment.key())
         article.put()
+        memcache.set("article"+str(article.id),article)
         self.redirect('/article?id='+str(article.id))
         
 class EditCommentPost(webapp.RequestHandler):
     def post(self):
         comment = db.get(self.request.get('commentKey'))
-        comment.body = self.request.get('commentBody')
-        comment.put()
+        if(comment.author == users.get_current_user()):
+            comment.body = self.request.get('commentBody')
+            comment.put()
+            memcache.set(str(comment.key()), comment)
         self.redirect('/article?id='+str(comment.article.id))
         
 class ReplyPost(webapp.RequestHandler):
@@ -91,21 +96,20 @@ class ReplyPost(webapp.RequestHandler):
         comment.put()
         parentComment.children.append(comment.key())
         parentComment.put()
+        memcache.set(str(parentComment.key()),parentComment)
         self.redirect('/article?id='+str(comment.article.id))
 
 class DeleteCommentPost(webapp.RequestHandler):
     def post(self):
         comment = db.get(self.request.get('key'))
-        comment.title = "deleted"
-        comment.body = "deleted"
-        comment.author = users.User("deleted")
-        comment.date = datetime.datetime.now().date()
-        comment.put()
+        if(comment.author == users.get_current_user()):
+            comment.title = "deleted"
+            comment.body = "deleted"
+            comment.author = users.User("deleted")
+            comment.date = datetime.datetime.now().date()
+            comment.put()
+            memcache.set(str(comment.key()), comment)
         self.redirect('/article?id='+str(comment.article.id))
-
-def printArticlePage(article):
-    
-    return ret
 
 def printArticle(article):
     title = misc.makeLink("/article?id="+str(article.id), article.title)
