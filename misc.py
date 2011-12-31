@@ -1,6 +1,6 @@
-import sys
 from google.appengine.ext import db
 from google.appengine.api import memcache
+from google.appengine.api import users
 
 MAX = 2147483647
 
@@ -8,6 +8,9 @@ def makeLink(url,content):
     return "<a href='%s'>%s</a>" %(url,content)
 
 def header():
+    admin = ""
+    if users.is_current_user_admin():
+        admin = "<small><a href='/admin'>Admin</a></small>"
     ret = """
     <html>
         <head>
@@ -18,8 +21,8 @@ def header():
         <body>
             <div class='content'>
                 <div class='header'>
-                    <a href='/'>David van Zessen</a>
-                </div>"""
+                    <a href='/'>David van Zessen</a> %s
+                </div>""" %(admin)
     return ret
 
 def footer():

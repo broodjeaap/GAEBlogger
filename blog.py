@@ -150,6 +150,9 @@ def printComments(comments,switch=False):
 def printComment(comment):
     user = users.get_current_user()
     key = str(comment.key())
+    reply = ""
+    if(user):
+        reply ="""<a id='reply_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>""" (key,key)
     deleteEdit = ""
     if(user == comment.author):
         deleteEdit = """
@@ -170,7 +173,7 @@ def printComment(comment):
                 %s
             </div>
             <div class='commentReply'>
-                <a id='reply_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>
+                %s
                 %s
             </div>
         </div>
@@ -181,7 +184,7 @@ def printComment(comment):
             
         </div>
     </div>
-    """ %(comment.author,str(comment.date),key,key,deleteEdit,key,comment.body,key)
+    """ %(comment.author,str(comment.date),reply,deleteEdit,key,comment.body,key)
     return ret
 
 def main():

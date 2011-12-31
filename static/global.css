@@ -40,6 +40,12 @@
 	font-weight: bold;
 }
 
+.header small{
+	font: normal 0.4em Georgia, "Times New Roman", Times, serif;
+	margin: 0 0 15px 15px;
+	font-weight: bold;
+}
+
 .article {
 	background-color: #EEE;
 	border-radius: 5px;
