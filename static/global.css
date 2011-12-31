@@ -121,6 +121,59 @@
 	
 }
 
+.adminMainDiv {
+	padding: 10px 0 10px 0;
+	background-color: #DDD;
+	border-radius: 5px;
+	border: 1px solid #BBB;
+	text-align: center;
+}
+
+.adminMainDiv a:link {
+	color:#777;
+	text-decoration:none;
+	font-size: 3em;
+}
+.adminMainDiv a:visited {
+	color:#777;
+	font-size: 3em;
+}
+.adminMainDiv a:hover {
+	color:#000;
+	font-size: 3em;
+	
+}
+
+.adminNewArticleDiv {
+	background-color: #EEE;
+	border-radius: 5px;
+	border: 1px solid #BBB;
+	margin: 5px 5px 5px 5px;
+	float:left;
+	width:48%;
+	height:60px;
+}
+
+.adminArticleArchiveDiv {
+	float:left;	
+	background-color: #EEE;
+	border-radius: 5px;
+	border: 1px solid #BBB;
+	margin: 5px 5px 5px 5px;
+	width:48%;
+	height:60px;
+}
+
+.adminAppSettingsDiv {
+	float:left;	
+	background-color: #EEE;
+	border-radius: 5px;
+	border: 1px solid #BBB;
+	margin: 5px 5px 5px 5px;
+	width:48%;
+	height:60px;
+}
+
 .articleTableDiv {
 	padding: 10px 0 10px 0;
 	margin-left: auto;

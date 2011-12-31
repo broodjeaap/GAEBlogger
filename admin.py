@@ -2,13 +2,43 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext import db
 from google.appengine.api import users
+from google.appengine.api.app_identity import get_application_id
 import models
 import datetime
 import blog
 import misc
+import os
 
 
 class AdminMain(webapp.RequestHandler):
+    def get(self):
+        self.response.out.write(misc.header())
+        appName = "#"
+        id = os.environ["APPLICATION_ID"]
+        tilde = id.find("~")
+        if(tilde != -1):
+            appName = "<a href='https://appengine.google.com/dashboard?app_id="+id[tilde+1:]+"'>App Settings</a>"
+        self.response.out.write(
+        """
+        <div class='adminMainDiv'>
+            <div class='adminNewArticleDiv'>
+                <a href='/admin/new'>New Article</a>
+            </div>
+            
+            <div class='adminArticleArchiveDiv'>
+                <a href='/admin/archive'>Article Archive</a>
+            </div>
+            <div style="clear: both;"></div>
+            <div class='adminAppSettingsDiv'>
+                %s
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        """ %(appName)) 
+
+        self.response.out.write(misc.footer())
+        
+class AdminArchive(webapp.RequestHandler):
     def get(self):
         self.response.out.write(misc.header())
         articleTable = "<div class='articleTableDiv'><table class='articleTable'><tr class='head'><th class='id'>ID#</th><th class='title'>Title</th><th class='comment'>Comments</th><th class='public'>Public</th></tr>"
@@ -151,6 +181,7 @@ def printAdminComment(comment):
 
 def main():
     application = webapp.WSGIApplication([('/admin', AdminMain),
+                                          ('/admin/archive', AdminArchive),
                                           ('/admin/new',AdminNewArticle),
                                           ('/admin/article',AdminArticle),
                                           ('/admin/newpost',AdminNewArticlePost),
