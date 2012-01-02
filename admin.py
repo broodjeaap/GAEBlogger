@@ -141,7 +141,10 @@ class AdminNewArticlePost(webapp.RequestHandler):
         article = models.Article(id= id,title = title,body = body,date=datetime.datetime.now().date(),public=public)
         article.put()
         memcache.add("article"+str(article.id),article)
-        self.redirect('/article?id='+str(article.id))
+        if(article.public):
+            self.redirect('/article?id='+str(article.id))
+        else:
+            self.redirect('/admin/article?id='+str(article.id))
 
 def printAdminComments(comments,switch=False):
     if(switch):

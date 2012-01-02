@@ -124,7 +124,7 @@
 }
 
 .commentBody {
-	
+	min-height:30px;
 }
 
 .adminMainDiv {

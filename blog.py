@@ -27,7 +27,7 @@ class Article(webapp.RequestHandler):
             article = misc.getArticle(id)
             if(article == None):
                 self.redirect('/')
-            else:
+            elif(article.public):
                 self.response.out.write(
                                         """
                                         <div class='article'>
@@ -65,6 +65,8 @@ class Article(webapp.RequestHandler):
                                             """ %(str(article.key())))
                 else:
                     self.response.out.write("<a href='"+users.create_login_url(self.request.uri)+"'>Login to comment.</a>")
+            else:
+                self.redirect('/')
         else:
             self.redirect('/')
         self.response.out.write(misc.footer())
@@ -72,7 +74,13 @@ class Article(webapp.RequestHandler):
 class CommentPost(webapp.RequestHandler):
     def post(self):
         article = db.get(self.request.get('key'))
-        comment = Comment(author=users.get_current_user(),body=self.request.get('commentBody'),date=datetime.datetime.now().date(),article=article.key())
+        commentBody = self.request.get('commentBody')
+        try:
+            commentBody = misc.cleanHtml(commentBody)
+            comment = Comment(author=users.get_current_user(),body=commentBody,date=datetime.datetime.now().date(),article=article.key())
+        except:
+            self.redirect('/article?id='+str(article.id))
+            return
         comment.put()
         memcache.set(str(comment.key()),comment)
         article.comments.append(comment.key())
@@ -84,14 +92,22 @@ class EditCommentPost(webapp.RequestHandler):
     def post(self):
         comment = db.get(self.request.get('commentKey'))
         if(comment.author == users.get_current_user()):
-            comment.body = self.request.get('commentBody')
-            comment.put()
-            memcache.set(str(comment.key()), comment)
+            commentBody = self.request.get('commentBody')
+            try:
+                commentBody = misc.cleanHtml(commentBody)
+                comment.body = commentBody
+                comment.put()
+                memcache.set(str(comment.key()), comment)
+            except:
+                self.redirect('/article?id='+str(comment.article.id))
+                return
         self.redirect('/article?id='+str(comment.article.id))
         
 class ReplyPost(webapp.RequestHandler):
     def post(self):
         parentComment = db.get(self.request.get('commentKey'))
+        commentBody = self.request.get('commentBody')
+        commentBody = misc.cleanHtml(commentBody)
         comment = Comment(author=users.get_current_user(),body=self.request.get('commentBody'),date=datetime.datetime.now().date(),_parent=parentComment,article=parentComment.article.key())
         comment.put()
         parentComment.children.append(comment.key())
