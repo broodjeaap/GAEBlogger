@@ -17,6 +17,22 @@ class Main(webapp.RequestHandler):
         articlesDiv += "</div>"
         self.response.out.write(articlesDiv)
         self.response.out.write(misc.footer())
+        
+class Search(webapp.RequestHandler):
+    def get(self):
+        self.response.out.write(misc.header())
+        allArticles = misc.getAllPublicArticles()
+        articles = []
+        search = self.request.get('s')
+        for article in allArticles:
+            if(article.title.lower().find(search.lower()) != -1):
+                articles.append(article)
+        articlesDiv = "<div class='articlesDiv'>"
+        for article in articles:
+            articlesDiv += printArticle(article)
+        articlesDiv += "</div>"
+        self.response.out.write(articlesDiv)
+        self.response.out.write(misc.footer())
 
 class Article(webapp.RequestHandler):
     def get(self):
@@ -209,7 +225,8 @@ def main():
                                           ('/commentpost', CommentPost),
                                           ('/deletecommentpost', DeleteCommentPost),
                                           ('/editcommentpost', EditCommentPost),
-                                          ('/replypost', ReplyPost)],
+                                          ('/replypost', ReplyPost),
+                                          ('/search', Search),],
                                          debug=True)
     util.run_wsgi_app(application)
 

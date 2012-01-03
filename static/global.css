@@ -40,6 +40,10 @@
 	font-weight: bold;
 }
 
+.searchBox {
+	float:right;
+}
+
 .header small{
 	font: normal 0.4em Georgia, "Times New Roman", Times, serif;
 	margin: 0 0 15px 15px;

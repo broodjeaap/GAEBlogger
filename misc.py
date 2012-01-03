@@ -36,6 +36,13 @@ def header():
             <div class='content'>
                 <div class='header'>
                     <a href='/'>David van Zessen</a> %s
+                    <div class='searchBox'>
+                        <form action='/search' method='get'>
+                            <input name='s' type='text' value='Search' onclick="this.value=''"/>
+                            <input type='submit' value='->' />
+                        </form>
+                    </div>
+                    <div style="clear: both;"></div>
                 </div>""" %(admin)
     return ret
 

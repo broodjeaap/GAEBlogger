@@ -1,7 +1,5 @@
 from google.appengine.ext import db
 
-
-
 class Article(db.Model):
     id = db.IntegerProperty()
     title = db.StringProperty(required=True)
@@ -10,7 +8,6 @@ class Article(db.Model):
     comments = db.ListProperty(db.Key)
     public = db.BooleanProperty(required=True, default=False)
 
-               
 class Comment(db.Model):
     author = db.UserProperty()
     body = db.TextProperty(required=True)
