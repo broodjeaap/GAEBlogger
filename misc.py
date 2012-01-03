@@ -1,23 +1,27 @@
 from google.appengine.ext import db
 from google.appengine.api import memcache
 from google.appengine.api import users
-from BeautifulSoup import BeautifulSoup, Comment
+from BeautifulSoup import BeautifulSoup
 
 MAX = 2147483647
 
-VALID_TAGS = ['a','br','abbr','acronym','address','b','strong','big','em','i','small','tt','sub','sup','blockquote','table','th','tr','td','catpion','ol','ul','li','p','pre']
-
+VALID_TAGS = ['a','br','abbr','acronym','address','b','strong','big','em','i','small','tt','sub','sup','blockquote','table','th','tr','td','caption','ol','ul','li','p','pre']
+VALID_ATTR = ['href','border']
 
 def makeLink(url,content):
     return "<a href='%s'>%s</a>" %(url,content)
 
 def cleanHtml(content):
     soup = BeautifulSoup(content)
-    soupOld = soup
+    soupOld = BeautifulSoup("")
     while(soupOld.renderContents() != soup.renderContents()):
         for tag in soup.findAll(True):
             if(tag.name not in VALID_TAGS):
                 tag.hidden = True
+            else:
+                for attr, value in tag.attrs:
+                    if(attr not in VALID_ATTR):
+                        del tag[attr]
         soupOld = soup
     return soup.renderContents()
 
