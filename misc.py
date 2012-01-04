@@ -99,6 +99,5 @@ def getAllPublicArticles():
 def countComments(list):
     count = 0
     for comment in list:
-        db.get(comment)
-        count += (countComments(db.get(comment).children) + 1)
+        count += (countComments(getComment(comment).children) + 1)
     return count

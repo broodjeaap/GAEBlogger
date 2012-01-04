@@ -60,8 +60,7 @@ class Article(webapp.RequestHandler):
                                             </div>
                                         </div>
                                     """ %(article.title, str(article.date), article.body))
-                length = len(article.comments) 
-                if(length > 0):
+                if article.comments:
                     self.response.out.write("Comments ("+str(misc.countComments(article.comments))+"): ")
                 else:
                     self.response.out.write("Be the first to comment!")
@@ -141,6 +140,8 @@ class DeleteCommentPost(webapp.RequestHandler):
                 memcache.delete(str(comment.key()))
                 comment.delete()
                 article.put()
+                memcache.delete("publicArticles")
+                memcache.delete("allArticles")
                 memcache.set("article"+str(article.id),article)
             else:
                 comment.title = "deleted"
@@ -182,7 +183,7 @@ def printComments(comments,switch=False):
     for key in comments:
         comment = misc.getComment(key)
         ret += printComment(comment)
-        if(len(comment.children) > 0):
+        if comment.children:
             ret += printComments(comment.children,(not switch))
     ret += "</div>"
     return ret
