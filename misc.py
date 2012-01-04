@@ -40,10 +40,9 @@ def header():
             <div class='content'>
                 <div class='header'>
                     <a href='/'>David van Zessen</a> %s
-                    <div class='searchBox'>
+                    <div class='searchBoxDiv'>
                         <form action='/search' method='get'>
-                            <input name='s' type='text' value='Search' onclick="this.value=''"/>
-                            <input type='submit' value='->' />
+                            <input name='s' class='searchBox' type='text' value='Search' onclick="this.value=''" /><input class='searchButton' type='submit' value='Search' />
                         </form>
                     </div>
                     <div style="clear: both;"></div>

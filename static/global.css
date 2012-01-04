@@ -40,8 +40,22 @@
 	font-weight: bold;
 }
 
-.searchBox {
+.searchBoxDiv {
 	float:right;
+}
+
+.searchBox {
+	border-style:solid;
+	border-radius: 1px;
+	background-color: #EDEDED;
+	border-color:#DFDFDF;
+}
+
+.searchButton {
+	border-style:solid;
+	border-radius: 1px;
+	background-color: #EDEDED;
+	border-color:#DFDFDF;
 }
 
 .header small{
