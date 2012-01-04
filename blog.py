@@ -135,12 +135,20 @@ class DeleteCommentPost(webapp.RequestHandler):
     def post(self):
         comment = db.get(self.request.get('key'))
         if(comment.author == users.get_current_user()):
-            comment.title = "deleted"
-            comment.body = "deleted"
-            comment.author = users.User("deleted")
-            comment.date = datetime.datetime.now().date()
-            comment.put()
-            memcache.set(str(comment.key()), comment)
+            if not comment.children:
+                article = comment.article
+                article.comments.remove(comment.key())
+                memcache.delete(str(comment.key()))
+                comment.delete()
+                article.put()
+                memcache.set("article"+str(article.id),article)
+            else:
+                comment.title = "deleted"
+                comment.body = "deleted"
+                comment.author = users.User("deleted")
+                comment.date = datetime.datetime.now().date()
+                comment.put()
+                memcache.set(str(comment.key()), comment)
         self.redirect('/article?id='+str(comment.article.id))
 
 def printArticle(article):

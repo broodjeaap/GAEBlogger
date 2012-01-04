@@ -141,6 +141,8 @@ class AdminNewArticlePost(webapp.RequestHandler):
         article = models.Article(id= id,title = title,body = body,date=datetime.datetime.now().date(),public=public)
         article.put()
         memcache.add("article"+str(article.id),article)
+        memcache.delete("publicArticles")
+        memcache.delete("allArticles")
         if(article.public):
             self.redirect('/article?id='+str(article.id))
         else:
