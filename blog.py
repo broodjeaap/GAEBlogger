@@ -10,12 +10,35 @@ import datetime
 class Main(webapp.RequestHandler):
     def get(self):
         self.response.out.write(misc.header())
-        articles = misc.getAllPublicArticles()
+        page = self.request.get('page')
+        if(page.isdigit()):
+            page = int(page)
+        else:
+            page = 0
+        ret = misc.getPublicArticles(page)
+        articles = ret[0]
+        nextPageBool = ret[1]
         articlesDiv = "<div class='articlesDiv'>"
         for article in articles:
             articlesDiv += printArticle(article)
         articlesDiv += "</div>"
         self.response.out.write(articlesDiv)
+        prevPage = """<a href='/?page=%s'>Previous page""" %(page-1)
+        nextPage = ""
+        if(page == 0):
+            prevPage = ""
+        if(nextPageBool):
+            nextPage = """<a href='/?page=%s'>Next page""" %(page+1)
+        self.response.out.write("""
+        <div class='pageControlDiv'>
+            <div class='prevPageDiv'>
+                %s
+            </div>
+            <div class='nextPageDiv'>
+                %s
+            </div>
+        </div>
+        """ %(prevPage,nextPage))
         self.response.out.write(misc.footer())
         
 class Search(webapp.RequestHandler):

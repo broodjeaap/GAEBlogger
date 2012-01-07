@@ -238,3 +238,22 @@
 .articleTable tr.odd{
 	background-color: #EEE;
 }
+
+.prevPageDiv {
+	float:left;
+}
+
+.nextPageDiv {
+	float:right;
+}
+
+.pageControlDiv a:link {
+	color:#000;
+	text-decoration:none;
+}
+.pageControlDiv a:visited {
+	color:#777;
+}
+.pageControlDiv a:hover {
+	color:#333;
+}

@@ -4,6 +4,7 @@ from google.appengine.api import users
 from BeautifulSoup import BeautifulSoup
 
 MAX = 2147483647
+ARTICLES_PER_PAGE = 10
 
 VALID_TAGS = ['a','br','abbr','acronym','address','b','strong','big','em','i','small','tt','sub','sup','blockquote','table','th','tr','td','caption','ol','ul','li','p','pre']
 VALID_ATTR = ['href','border']
@@ -94,6 +95,28 @@ def getAllPublicArticles():
         articles = articles.fetch(MAX)
         memcache.set("publicArticles",articles)
         return articles
+    
+def getPublicArticles(page=0):
+    start = page*ARTICLES_PER_PAGE
+    limit = start + ARTICLES_PER_PAGE
+    allArticles = getAllPublicArticles()
+    length = len(allArticles)
+    if(start > length):
+        start = 0
+        limit = ARTICLES_PER_PAGE
+    if(limit > length):
+        limit = length
+    ret = []
+    articles = []
+    for x in range(start,limit):
+        articles.append(allArticles[x])
+    ret.append(articles)
+    if(limit+1 > length):
+        ret.append(False)
+    else:
+        ret.append(True)
+    return ret
+    
         
 def countComments(list):
     count = 0
