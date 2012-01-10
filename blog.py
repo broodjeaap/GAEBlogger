@@ -23,12 +23,12 @@ class Main(webapp.RequestHandler):
             articlesDiv += printArticle(article)
         articlesDiv += "</div>"
         self.response.out.write(articlesDiv)
-        prevPage = """<a href='/?page=%s'>Previous page""" %(page-1)
+        prevPage = """<a href='/?page=%s'>Older""" %(page-1)
         nextPage = ""
         if(page == 0):
             prevPage = ""
         if(nextPageBool):
-            nextPage = """<a href='/?page=%s'>Next page""" %(page+1)
+            nextPage = """<a href='/?page=%s'>Newer""" %(page+1)
         self.response.out.write("""
         <div class='pageControlDiv'>
             <div class='prevPageDiv'>
@@ -47,9 +47,12 @@ class Search(webapp.RequestHandler):
         allArticles = misc.getAllPublicArticles()
         articles = []
         search = self.request.get('s')
+        searchList = search.split(" ")
         for article in allArticles:
-            if(article.title.lower().find(search.lower()) != -1):
-                articles.append(article)
+            for word in searchList:
+                if(article.title.lower().find(word.lower()) != -1):
+                    if article not in articles:
+                        articles.append(article)
         articlesDiv = "<div class='articlesDiv'>"
         for article in articles:
             articlesDiv += printArticle(article)
@@ -124,6 +127,8 @@ class CommentPost(webapp.RequestHandler):
         article.comments.append(comment.key())
         article.put()
         memcache.set("article"+str(article.id),article)
+        memcache.delete("publicArticles")
+        memcache.delete("allArticles")
         self.redirect('/article?id='+str(article.id))
         
 class EditCommentPost(webapp.RequestHandler):
@@ -151,6 +156,8 @@ class ReplyPost(webapp.RequestHandler):
         parentComment.children.append(comment.key())
         parentComment.put()
         memcache.set(str(parentComment.key()),parentComment)
+        memcache.delete("publicArticles")
+        memcache.delete("allArticles")
         self.redirect('/article?id='+str(comment.article.id))
 
 class DeleteCommentPost(webapp.RequestHandler):

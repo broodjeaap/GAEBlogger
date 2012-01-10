@@ -35,7 +35,6 @@ class AdminMain(webapp.RequestHandler):
             <div style="clear: both;"></div>
         </div>
         """ %(appName)) 
-
         self.response.out.write(misc.footer())
         
 class AdminArchive(webapp.RequestHandler):

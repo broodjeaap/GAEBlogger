@@ -257,3 +257,5 @@
 .pageControlDiv a:hover {
 	color:#333;
 }
+.commentHeader a:link {
+	text-decoration:none;

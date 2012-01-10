@@ -4,7 +4,7 @@ from google.appengine.api import users
 from BeautifulSoup import BeautifulSoup
 
 MAX = 2147483647
-ARTICLES_PER_PAGE = 10
+ARTICLES_PER_PAGE = 5
 
 VALID_TAGS = ['a','br','abbr','acronym','address','b','strong','big','em','i','small','tt','sub','sup','blockquote','table','th','tr','td','caption','ol','ul','li','p','pre']
 VALID_ATTR = ['href','border']
@@ -40,7 +40,7 @@ def header():
         <body>
             <div class='content'>
                 <div class='header'>
-                    <a href='/'>David van Zessen</a> %s
+                    <a href='/'>Blog</a> %s
                     <div class='searchBoxDiv'>
                         <form action='/search' method='get'>
                             <input name='s' class='searchBox' type='text' value='Search' onclick="this.value=''" /><input class='searchButton' type='submit' value='Search' />
@@ -91,7 +91,7 @@ def getAllPublicArticles():
     if(articles != None):
         return articles
     else:
-        articles = db.GqlQuery("SELECT * FROM Article WHERE public = True")
+        articles = db.GqlQuery("SELECT * FROM Article WHERE public = True ORDER BY id")
         articles = articles.fetch(MAX)
         memcache.set("publicArticles",articles)
         return articles
