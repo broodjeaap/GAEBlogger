@@ -5,3 +5,11 @@ function deletecomment(key){
 		$("#form_"+key).submit();
 	}
 }
+
+function deletearticle(){
+	var result = confirm("Are you sure you want to delete this article?");
+	if(result){
+		$("#hiddenDelete").val("delete");
+		document.forms["deleteArticle"].submit();
+	}
+}

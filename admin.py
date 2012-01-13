@@ -61,8 +61,14 @@ class AdminArticle(webapp.RequestHandler):
         checked = ""
         if(article.public):
             checked = "checked='checked'"
+        key = str(article.key())
         articleDiv = """
         <script type='text/javascript' src='/static/admin.js'></SCRIPT>
+        <form name='deleteArticle' action='/admin/deletearticlepost' method='post'>
+            <input class='adminDeleteButton' type='button' value='Delete this article' onclick='deletearticle()'/>
+            <input type='hidden' value='%s' name ='key' />
+            <input id='hiddenDelete' type='hidden' value='' name='delete' />
+        </form>
         <div class='articleEditDiv'>
             <form name='editArticle' action='/admin/editpost' method='post'>
                 <div class='titleEditDiv'>
@@ -77,7 +83,7 @@ class AdminArticle(webapp.RequestHandler):
                 <input type='submit' value='Save' />
                 <input type='hidden' name='key' value='%s' />
             </form>
-        </div>""" %(article.title, article.body, checked, str(article.key()))
+        </div>""" %(key, article.title, article.body, checked, key)
         self.response.out.write(articleDiv)
         self.response.out.write(printAdminComments(article.comments))
         self.response.out.write(misc.footer())
@@ -97,7 +103,29 @@ class AdminEditArticlePost(webapp.RequestHandler):
         memcache.delete("allArticles")
         article.put()
         self.redirect('/admin/article?id='+str(article.id))
-        
+
+
+
+class DeleteArticlePost(webapp.RequestHandler):
+    def post(self):
+        if(self.request.get('delete') == 'delete'):
+            article = db.get(self.request.get('key'))
+            for commentKey in article.comments:
+                deleteComment(commentKey)
+            memcache.delete("article"+str(article.id))
+            memcache.delete("publicArticles")
+            memcache.delete("allArticles")
+            article.delete()
+        self.redirect('/admin/archive')
+
+def deleteComment(key):
+    comment = misc.getComment(key)
+    if comment.children:
+        for commentKey in comment.children:
+            deleteComment(misc.getComment(commentKey).key())
+    memcache.delete(str(comment.key()))
+    comment.delete()
+            
 class DeleteCommentPost(webapp.RequestHandler):
     def post(self):
         key = self.request.get('key')
@@ -176,7 +204,7 @@ def printAdminComment(comment):
                 <form id='form_%s' name='deleteComment' action='/admin/deletecommentpost' method='post'>
                     <input type='hidden' name='key' value='%s' />
                     <input type='hidden' name='reason' value='' id='reason_%s'/>
-                    <input type='button' value='Delete' onclick="deletecomment('%s')" />
+                    <input class='adminDeleteButton' type='button' value='Delete' onclick="deletecomment('%s')" />
                 </form>
                 
             </div>
@@ -195,7 +223,8 @@ def main():
                                           ('/admin/article',AdminArticle),
                                           ('/admin/newpost',AdminNewArticlePost),
                                           ('/admin/editpost',AdminEditArticlePost),
-                                          ('/admin/deletecommentpost',DeleteCommentPost)],
+                                          ('/admin/deletecommentpost',DeleteCommentPost),
+                                          ('/admin/deletearticlepost',DeleteArticlePost)],
                                          debug=True)
     util.run_wsgi_app(application)
 

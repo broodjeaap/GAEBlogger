@@ -198,6 +198,13 @@
 	height:60px;
 }
 
+.adminDeleteButton {
+	border-style:solid;
+	border-radius: 1px;
+	background-color: #FFAAAA;
+	border-color:#FF6666;
+}
+
 .articleTableDiv {
 	padding: 10px 0 10px 0;
 	margin-left: auto;
