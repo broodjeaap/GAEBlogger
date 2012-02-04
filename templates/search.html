@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class='articlesDiv'>
+	{% if articles %}
+		{% for article in articles %}
+			<div class='article'>
+				<div class='articleHeader'>
+					<div class='articleTitle'>
+						<a href='/article?id={{ article.id }}'>{{ article.title }}</a>
+					</div>
+					<div class='articleDate'>
+						{{ article.date }}
+					</div>
+				</div>
+				<div class='articleBody'>
+					{{ article.body }}
+				</div>
+				<div class='articleCommentLink'>
+					<a href='article?id={{ article.id }}'>Comments</a>
+				</div>
+			</div>
+		{% endfor %}
+			<div class='pageControlDiv'>
+			{% if prevpage %}
+				<div class='prevPageDiv'>
+					<a href='/search?s={{ search }}&page={{ prevpage }}'>Back</a>
+				</div>
+			{% endif %}
+			{% if nextpagebool %}
+				<div class='nextPageDiv'>
+					<a href='/search?s={{ search }}&page={{ nextpage }}'>More</a>
+				</div>
+			{% endif %}
+			</div>
+	{% else %}
+		No results.
+	{% endif %}
+	</div>
+{% endblock %}

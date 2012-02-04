@@ -1,0 +1,37 @@
+<div class='articleComment'>
+	<div class='commentHeader'>
+		<div class='commentAuthor'>    
+			{{ comment.author }}
+		</div>
+		<div class='commentDate'>
+			{{ comment.date }}
+		</div>
+		{% if commentauthor %}
+			<div class='commentReply'>
+				<a id='reply_{{ key }}' href='javascript:void(0)' onclick="reply('{{ key }}')" >reply</a>
+				<a href='javascript:void(0)' onclick="deleteComment('{{ key }}')" >delete</a>
+				<a id='edit_{{ key }}' href='javascript:void(0)' onclick="editComment('{{ key }}')" >edit</a>
+				<form id='deleteComment_{{ key }}' name='deleteComment_{{ key }}' action='/deletecommentpost' method='post'>
+					<input type='hidden' name='key' value='{{ key }}' />
+				</form>
+			</div>
+		{% else %}
+			{% if loggedin %}
+				<div class='commentReply'>
+					<a id='reply_{{ key }}' href='javascript:void(0)' onclick="reply('{{ key }}')" >reply</a>
+				</div>
+			{% else %}
+				<div style="clear: both;"></div>
+			{% endif %}
+		{% endif %}
+	</div>
+	<div id='commentBody_{{ key }}' class='commentBody'>
+		{{ comment.body }}
+	</div>
+	<div id='div_{{ key }}' class='commentReplyDiv'>
+		
+	</div>
+</div>
+
+
+

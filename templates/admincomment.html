@@ -1,0 +1,21 @@
+<div class='articleComment'>
+	<div class='commentHeader'>
+		<div class='commentAuthor'>    
+			{{ comment.author }}
+		</div>
+		<div class='commentDate'>
+			{{ comment.date }}
+		</div>
+		<div class='commentDelete'>
+			<form id='form_{{ key }}' name='deleteComment' action='/admin/deletecommentpost' method='post'>
+				<input type='hidden' name='key' value='{{ key }}' />
+				<input type='hidden' name='reason' value='' id='reason_{{ key }}'/>
+				<input class='adminDeleteButton' type='button' value='Delete' onclick="deletecomment('{{ key }}')" />
+			</form>
+			
+		</div>
+	</div>
+	<div class='commentBody'>
+		{{ comment.body }}
+	</div>
+</div>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class='article'>
+		<div class='articleHeader'>
+			<div class='articleTitle'>
+				{{ article.title }}
+			</div>
+			<div class='articleDate'>
+				{{ article.data }}
+			</div>
+		</div>
+		<div class='articleBody'>
+			{{ article.body }}
+		</div>
+		{% if article.comments %}
+			Comments: 
+			{{ comments }}
+		{% else %}
+			Be the first to comment!
+		{% endif %}
+		{% if loggedin %}
+			<div class='commentBox'><form name='comment' action='/commentpost' method='post'>
+				<div class='commentTextArea'>
+					<textarea name='commentBody' cols='50' rows='6'></textarea>
+				</div>
+				<div class='commentHiddenSubmit'>
+					<input type='hidden' name='key' value='{{ key }}' />
+					<input type='submit' value='Comment' />
+				</div>
+			</div>
+		{% else %} 
+			<a href='{{ loginurl }}'>Login to comment.</a>
+		{% endif %}
+	</div>
+{% endblock %}

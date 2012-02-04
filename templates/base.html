@@ -1,0 +1,25 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Blog</title>
+		<link rel="stylesheet" href="/static/global.css"/>
+		<script type='text/javascript' src='/static/jquery-1.7.1.min.js'></script>
+		<script type='text/javascript' src='/static/script.js'></script>
+	</head>
+	<body>
+		<div class='content'>
+			<div class='header'>
+				<a href='/'>Blog</a>
+				<div class='searchBoxDiv'>
+					<form action='/search' method='get'>
+						<input type='hidden' name='page' value='1' /><input name='s' class='searchBox' type='text' value='Search' onclick="this.value=''" /><input class='searchButton' type='submit' value='Search' />
+					</form>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+			{% block content %}
+			
+			{% endblock %}
+		</div>
+	</body>
+</html>

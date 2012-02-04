@@ -9,9 +9,6 @@ ARTICLES_PER_PAGE = 5
 VALID_TAGS = ['a','br','abbr','acronym','address','b','strong','big','em','i','small','tt','sub','sup','blockquote','table','th','tr','td','caption','ol','ul','li','p','pre']
 VALID_ATTR = ['href','border']
 
-def makeLink(url,content):
-    return "<a href='%s'>%s</a>" %(url,content)
-
 def cleanHtml(content):
     soup = BeautifulSoup(content)
     soupOld = BeautifulSoup("")
@@ -25,34 +22,6 @@ def cleanHtml(content):
                         del tag[attr]
         soupOld = soup
     return soup.renderContents()
-
-def header():
-    admin = ""
-    if users.is_current_user_admin():
-        admin = "<small><a href='/admin'>Admin</a></small>"
-    ret = """
-    <html>
-        <head>
-            <link rel="stylesheet" href="/static/global.css"/>
-            <script type='text/javascript' src='/static/jquery-1.6.4.js'></SCRIPT>
-            <script type='text/javascript' src='/static/script.js'></SCRIPT>
-        </head>
-        <body>
-            <div class='content'>
-                <div class='header'>
-                    <a href='/'>Blog</a> %s
-                    <div class='searchBoxDiv'>
-                        <form action='/search' method='get'>
-                            <input name='s' class='searchBox' type='text' value='Search' onclick="this.value=''" /><input class='searchButton' type='submit' value='Search' />
-                        </form>
-                    </div>
-                    <div style="clear: both;"></div>
-                </div>""" %(admin)
-    return ret
-
-def footer():
-    ret = "</div></body></html>"
-    return ret
 
 def getComment(key):
     comment = memcache.get(str(key))
@@ -96,7 +65,8 @@ def getAllPublicArticles():
         memcache.set("publicArticles",articles)
         return articles
     
-def getPublicArticles(page=0):
+def getPublicArticles(page=1):
+    page -= 1
     start = page*ARTICLES_PER_PAGE
     limit = start + ARTICLES_PER_PAGE
     allArticles = getAllPublicArticles()

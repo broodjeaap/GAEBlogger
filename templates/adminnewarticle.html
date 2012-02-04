@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div id='newArticleDiv'>
+	<form name='newArticle' action='/admin/newpost' method='post'>
+		<div class='adminTitle' id='newArticleTitle'>
+			<input type='text' value='Title' name='title' id='title'/>
+		</div>
+		<div class='adminBody' id='newArticleBody'>
+			<textarea name='body' cols='100' rows='20'></textarea>
+		</div>
+		<div class='adminPublic' id='newArticlePublic'>
+		<input type='checkbox' name='public' value='public' /> Publish on blog. </div>
+		<div class='adminSubmit' id='newArticleSubmit'><input type='submit' name='submit' value='Save' /></div>
+	</form>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='adminMainDiv'>
+	<div class='adminNewArticleDiv'>
+		<a href='/admin/new'>New Article</a>
+	</div>
+	
+	<div class='adminArticleArchiveDiv'>
+		<a href='/admin/archive'>Article Archive</a>
+	</div>
+	<div style="clear: both;"></div>
+	<div class='adminAppSettingsDiv'>
+		<a href='https://appengine.google.com/dashboard?app_id={{ appname }}'>App Settings</a>
+	</div>
+	<div style="clear: both;"></div>
+</div>
+{% endblock %}

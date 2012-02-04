@@ -2,6 +2,8 @@ from google.appengine.ext import webapp
 from google.appengine.api import users
 from google.appengine.ext.webapp import util
 from google.appengine.api import memcache
+from google.appengine.ext.webapp import template
+import os
 from models import *
 import misc
 import datetime
@@ -9,60 +11,57 @@ import datetime
 
 class Main(webapp.RequestHandler):
     def get(self):
-        self.response.out.write(misc.header())
         page = self.request.get('page')
         if(page.isdigit()):
             page = int(page)
         else:
-            page = 0
+            page = 1
         ret = misc.getPublicArticles(page)
         articles = ret[0]
         nextPageBool = ret[1]
-        articlesDiv = "<div class='articlesDiv'>"
-        for article in articles:
-            articlesDiv += printArticle(article)
-        articlesDiv += "</div>"
-        self.response.out.write(articlesDiv)
-        prevPage = """<a href='/?page=%s'>Older""" %(page-1)
-        nextPage = ""
-        if(page == 0):
-            prevPage = ""
-        if(nextPageBool):
-            nextPage = """<a href='/?page=%s'>Newer""" %(page+1)
-        self.response.out.write("""
-        <div class='pageControlDiv'>
-            <div class='prevPageDiv'>
-                %s
-            </div>
-            <div class='nextPageDiv'>
-                %s
-            </div>
-        </div>
-        """ %(prevPage,nextPage))
-        self.response.out.write(misc.footer())
+        template_values = {
+            'articles': articles,
+            'nextpage': (page+1),
+            'nextpagebool': nextPageBool,
+            'prevpage': (page-1),
+        }
+        path = os.path.join(os.path.dirname(__file__), 'templates/articles.html')
+        self.response.out.write(template.render(path, template_values))
+        
         
 class Search(webapp.RequestHandler):
     def get(self):
-        self.response.out.write(misc.header())
         allArticles = misc.getAllPublicArticles()
         articles = []
         search = self.request.get('s')
+        page = self.request.get('page')
+        if page.isdigit():
+           page = int(page)-1
+        else:
+            page = 1
         searchList = search.split(" ")
         for article in allArticles:
             for word in searchList:
                 if(article.title.lower().find(word.lower()) != -1):
-                    if article not in articles:
-                        articles.append(article)
-        articlesDiv = "<div class='articlesDiv'>"
-        for article in articles:
-            articlesDiv += printArticle(article)
-        articlesDiv += "</div>"
-        self.response.out.write(articlesDiv)
-        self.response.out.write(misc.footer())
+                    articles.append(article)   
+                    break
+        nextPageBool = False
+        if len(articles) > misc.ARTICLES_PER_PAGE * page + misc.ARTICLES_PER_PAGE:
+            nextPageBool = True
+        articles = articles[misc.ARTICLES_PER_PAGE*page:misc.ARTICLES_PER_PAGE*page+misc.ARTICLES_PER_PAGE]
+        template_values = {
+            'articles': articles,
+            'nextpage': (page+2),
+            'nextpagebool':nextPageBool,
+            'prevpage':(page),
+            'search': search,
+        }
+        path = os.path.join(os.path.dirname(__file__), 'templates/search.html')
+        self.response.out.write(template.render(path, template_values))
+        
 
 class Article(webapp.RequestHandler):
     def get(self):
-        self.response.out.write(misc.header())
         id = self.request.get('id')
         user = users.get_current_user()
         if(id.isdigit()):
@@ -70,47 +69,27 @@ class Article(webapp.RequestHandler):
             if(article == None):
                 self.redirect('/')
             elif(article.public):
-                self.response.out.write(
-                                        """
-                                        <div class='article'>
-                                            <div class='articleHeader'>
-                                                <div class='articleTitle'>
-                                                    %s
-                                                </div>
-                                                <div class='articleDate'>
-                                                    %s
-                                                </div>
-                                            </div>
-                                            <div class='articleBody'>
-                                                %s
-                                            </div>
-                                        </div>
-                                    """ %(article.title, str(article.date), article.body))
-                if article.comments:
-                    self.response.out.write("Comments ("+str(misc.countComments(article.comments))+"): ")
+                
+                loggedIn = False
+                loginUrl = ""
+                if user:
+                    loggedIn = True
                 else:
-                    self.response.out.write("Be the first to comment!")
-                self.response.out.write(printComments(article.comments))
-                if(user):
-                    self.response.out.write(
-                                            """
-                                            <div class='commentBox'><form name='comment' action='/commentpost' method='post'>
-                                                <div class='commentTextArea'>
-                                                    <textarea name='commentBody' cols='50' rows='6'></textarea>
-                                                </div>
-                                                <div class='commentHiddenSubmit'>
-                                                    <input type='hidden' name='key' value='%s' />
-                                                    <input type='submit' value='Comment' />
-                                                </div>
-                                            </div>
-                                            """ %(str(article.key())))
-                else:
-                    self.response.out.write("<a href='"+users.create_login_url(self.request.uri)+"'>Login to comment.</a>")
+                    loginUrl = users.create_login_url(self.request.uri)
+                
+                template_values = {
+                    'article': article,
+                    'comments':printComments(article.comments),
+                    'loggedin':loggedIn,
+                    'loginurl': loginUrl,
+                    'key': article.key(),
+                }
+                path = os.path.join(os.path.dirname(__file__), 'templates/article.html')
+                self.response.out.write(template.render(path, template_values))
             else:
                 self.redirect('/')
         else:
             self.redirect('/')
-        self.response.out.write(misc.footer())
         
 class CommentPost(webapp.RequestHandler):
     def post(self):
@@ -182,29 +161,6 @@ class DeleteCommentPost(webapp.RequestHandler):
                 memcache.set(str(comment.key()), comment)
         self.redirect('/article?id='+str(comment.article.id))
 
-def printArticle(article):
-    title = misc.makeLink("/article?id="+str(article.id), article.title)
-    comments = misc.makeLink("/article?id="+str(article.id), "Comments ("+str(misc.countComments(article.comments))+")")   
-    ret = """
-        <div class='article'>
-            <div class='articleHeader'>
-                <div class='articleTitle'>
-                    %s
-                </div>
-                <div class='articleDate'>
-                    %s
-                </div>
-            </div>
-            <div class='articleBody'>
-                %s
-            </div>
-            <div class='articleCommentLink'>
-                %s
-            </div>
-        </div>
-    """ %(title, str(article.date), article.body,comments)
-    return ret
-
 def printComments(comments,switch=False):
     if(switch):
         ret = "<div class='articleCommentsSwitch'>"
@@ -220,43 +176,20 @@ def printComments(comments,switch=False):
 
 def printComment(comment):
     user = users.get_current_user()
-    key = str(comment.key())
-    reply = ""
-    if(user):
-        reply ="""<a id='reply_%s' href='javascript:void(0)' onclick="reply('%s')" >reply</a>""" %(key,key)
-    deleteEdit = ""
+    loggedin = False
+    if user:
+        loggedin = True
+    commentauthor = False
     if(user == comment.author):
-        deleteEdit = """
-        <a href='javascript:void(0)' onclick="deleteComment('%s')" >delete</a>
-        <a id='edit_%s' href='javascript:void(0)' onclick="editComment('%s')" >edit</a>
-        <form id='deleteComment_%s' name='deleteComment_%s' action='/deletecommentpost' method='post'>
-            <input type='hidden' name='key' value='%s' />
-        </form>
-        """ %(key,key,key,key,key,key)
-    
-    ret = """
-    <div class='articleComment'>
-        <div class='commentHeader'>
-            <div class='commentAuthor'>    
-                %s
-            </div>
-            <div class='commentDate'>
-                %s
-            </div>
-            <div class='commentReply'>
-                %s
-                %s
-            </div>
-        </div>
-        <div id='commentBody_%s' class='commentBody'>
-%s
-        </div>
-        <div id='div_%s' class='commentReplyDiv'>
-            
-        </div>
-    </div>
-    """ %(comment.author,str(comment.date),reply,deleteEdit,key,comment.body,key)
-    return ret
+        commentauthor = True
+    template_values = {
+        'comment': comment,
+        'loggedin':loggedin,
+        'commentauthor': commentauthor,
+        'key': comment.key(),
+    }
+    path = os.path.join(os.path.dirname(__file__), 'templates/comment.html')
+    return template.render(path, template_values)
 
 def main():
     application = webapp.WSGIApplication([('/', Main),
