@@ -1,4 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-	{{ articletable }}
+	<div class='articleTableDiv'>
+		<table class='articleTable'>
+			<tr class='head'>
+				<th class='id'>ID#</th>
+				<th class='title'>Title</th>
+				<th class='comment'>Comments</th>
+				<th class='public'>Public</th>
+			</tr>
+			{% for article in articles %}
+			<tr class="{% cycle even,odd %}">
+				<td class='id'>
+					<a href='/admin/article?id={{ article.id }}'>{{ article.id }}</a>
+				</td>
+				<td class='title'>
+					<a href='/admin/article?id={{ article.id }}'>{{ article.title }}</a>
+				</td>
+				<td class='comment'>
+					<a href='/admin/article?id={{ article.id }}'>{{ article.comments|length }}</a>
+				</td>
+				<td class='public'>
+					<a href='/admin/article?id={{ article.id }}'>{{ article.public }}</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
 {% endblock %}

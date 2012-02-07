@@ -27,19 +27,9 @@ class AdminMain(webapp.RequestHandler):
         
 class AdminArchive(webapp.RequestHandler):
     def get(self):
-        articleTable = "<div class='articleTableDiv'><table class='articleTable'><tr class='head'><th class='id'>ID#</th><th class='title'>Title</th><th class='comment'>Comments</th><th class='public'>Public</th></tr>"
         articles = misc.getAllArticles()
-        even = True
-        for article in articles:
-            link = "/admin/article?id="+str(article.id)
-            if(even):
-                articleTable += "<tr class='even'><td class='id'>%s</td><td class='title'>%s</td><td class='comment'>%s</td><td class='public'>%s</td></tr>" %(misc.makeLink(link, str(article.id)),misc.makeLink(link, article.title),misc.makeLink(link, str(misc.countComments(article.comments))),misc.makeLink(link, str(article.public)))
-            else:
-                articleTable += "<tr class='odd'><td class='id'>%s</td><td class='title'>%s</td><td class='comment'>%s</td><td class='public'>%s</td></tr>" %(misc.makeLink(link, str(article.id)),misc.makeLink(link, article.title),misc.makeLink(link, str(misc.countComments(article.comments))),misc.makeLink(link, str(article.public)))
-            even = not even
-        articleTable += "</table></div>"
         template_values = {
-            'articletable': articleTable,
+            'articles': articles,
         }
         path = os.path.join(os.path.dirname(__file__), 'templates/adminarchive.html')
         self.response.out.write(template.render(path, template_values))
