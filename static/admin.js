@@ -13,3 +13,7 @@ function deletearticle(){
 		document.forms["deleteArticle"].submit();
 	}
 }
+
+function previewarticle(){
+	$("#articlepreview").html($("#articlecontent").val());
+}

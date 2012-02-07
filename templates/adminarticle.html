@@ -12,7 +12,7 @@
 				<input type='text' name='title' value='{{ article.title }}' />
 			</div>
 			<div class='editBody'>
-				<textarea name='body' cols='100' rows='20'>{{ article.body }}</textarea>
+				<textarea name='body' cols='100' rows='20' onkeyup='previewarticle()' id='articlecontent'>{{ article.body }}</textarea>
 			</div>
 			<div class='editPublic'>
 				{% if article.public %}
@@ -25,5 +25,11 @@
 			<input type='hidden' name='key' value='{{ key }}' />
 		</form>
 	</div>
-	{{ comments }}
+	Preview:
+	<div class='article' id='articlepreview'>
+		{{ article.body }}
+	</div>
+	<div class='articleComments'>
+		{{ comments }}
+	</div>
 {% endblock %}

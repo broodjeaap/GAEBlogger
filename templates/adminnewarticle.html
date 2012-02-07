@@ -1,16 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
+<script type='text/javascript' src='/static/admin.js'></SCRIPT>
 <div id='newArticleDiv'>
 	<form name='newArticle' action='/admin/newpost' method='post'>
 		<div class='adminTitle' id='newArticleTitle'>
 			<input type='text' value='Title' name='title' id='title'/>
 		</div>
 		<div class='adminBody' id='newArticleBody'>
-			<textarea name='body' cols='100' rows='20'></textarea>
+			<textarea name='body' cols='100' rows='20' onkeyup='previewarticle()' id='articlecontent'></textarea>
 		</div>
 		<div class='adminPublic' id='newArticlePublic'>
 		<input type='checkbox' name='public' value='public' /> Publish on blog. </div>
 		<div class='adminSubmit' id='newArticleSubmit'><input type='submit' name='submit' value='Save' /></div>
 	</form>
+	Preview:
+	<div class='article' id='articlepreview'>
+		
+	</div>
 </div>
 {% endblock %}

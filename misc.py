@@ -12,7 +12,7 @@ VALID_ATTR = ['href','border']
 def cleanHtml(content):
     soup = BeautifulSoup(content)
     soupOld = BeautifulSoup("")
-    while(soupOld.renderContents() != soup.renderContents()):
+    while(soupOld != soup):
         for tag in soup.findAll(True):
             if(tag.name not in VALID_TAGS):
                 tag.hidden = True
