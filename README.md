@@ -1,5 +1,5 @@
 # Demo
-[davidzessen.appspot.com](davidzessen.appspot.com)
+[davidzessen.appspot.com](http://davidzessen.appspot.com)
 # Get Started
 Change the application name in the app.yaml file:
 	application: blog
