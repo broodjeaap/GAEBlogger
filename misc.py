@@ -86,10 +86,3 @@ def getPublicArticles(page=1):
     else:
         ret.append(True)
     return ret
-    
-        
-def countComments(list):
-    count = 0
-    for comment in list:
-        count += (countComments(getComment(comment).children) + 1)
-    return count

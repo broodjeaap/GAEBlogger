@@ -23,8 +23,7 @@ class AdminMain(webapp.RequestHandler):
         }
         path = os.path.join(os.path.dirname(__file__), 'templates/admin.html')
         self.response.out.write(template.render(path, template_values))
-        
-        
+             
 class AdminArchive(webapp.RequestHandler):
     def get(self):
         articles = misc.getAllArticles()
@@ -62,8 +61,6 @@ class AdminEditArticlePost(webapp.RequestHandler):
         article.put()
         self.redirect('/admin/article?id='+str(article.id))
 
-
-
 class DeleteArticlePost(webapp.RequestHandler):
     def post(self):
         if(self.request.get('delete') == 'delete'):
@@ -94,9 +91,7 @@ class DeleteCommentPost(webapp.RequestHandler):
         comment.date = datetime.datetime.now().date()
         comment.put()
         memcache.set(str(comment.key()),comment)
-        self.redirect('/admin/article?id='+str(comment.article.id))
-        
-        
+        self.redirect('/admin/article?id='+str(comment.article.id))       
     
 class AdminNewArticle(webapp.RequestHandler):
     def get(self):
@@ -134,7 +129,6 @@ def printAdminComments(comments,switch=False):
         ret += printAdminComment(comment)
         if(len(comment.children) > 0):
             ret += printAdminComments(comment.children,(not switch))
-        
     ret += "</div>"
     return ret
 
