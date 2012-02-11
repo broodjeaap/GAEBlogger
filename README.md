@@ -10,6 +10,8 @@ Change the blog title in base.html:
 Change the favicon in the static directory.
 
 And you're done, test it out locally or deploy it and get blogging :)
+
+Go to '/admin' to create a new article.
 # Third party software
 +	[JQuery](http://jquery.com/)
 +	[Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/)
